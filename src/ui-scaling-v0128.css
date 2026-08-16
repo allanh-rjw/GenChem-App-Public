@@ -1,0 +1,22 @@
+/* v0.12.8 sizing hotfix: normalize both the main application and the startup
+   experiment-setup dialog at 100% browser zoom. The setup dialog lives outside
+   .app-shell, so scaling only .app-shell left the initial load view oversized.
+   Use a compact 64% desktop scale so the full simulation fits comfortably in
+   a normal browser window without changing the responsive mobile layout. */
+@media (min-width:721px){
+  .app-shell{
+    zoom:.64;
+    width:156.25%;
+    min-height:156.25vh;
+  }
+  .sidebar{
+    height:156.25vh;
+  }
+  .setup-dialog{
+    zoom:.64;
+  }
+}
+
+/* Preserve the intended burette highlight width even if an older generated
+   index contains the misspelled presentation attribute. */
+.burette-wrap svg path[d="M40 20V218"]{stroke-width:3}
