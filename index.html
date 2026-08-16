@@ -6,187 +6,37 @@
   <title>General Chemistry | Acid–Base Titration Simulator</title>
   <link rel="stylesheet" href="./src/styles.css" />
   <link rel="stylesheet" href="./src/ui-scaling-v0128.css" />
+  <link rel="stylesheet" href="./src/instructional-v0130.css" />
 </head>
 <body>
   <div class="app-shell">
     <aside class="sidebar">
-      <div class="brand">
-        <div class="brand-mark">GC</div>
-        <div>
-          <div class="brand-title">General Chemistry</div>
-          <div class="brand-subtitle">Interactive Laboratory</div>
-        </div>
-      </div>
-
+      <div class="brand"><div class="brand-mark">GC</div><div><div class="brand-title">General Chemistry</div><div class="brand-subtitle">Interactive Laboratory</div></div></div>
       <div class="nav-heading">Topics</div>
-      <button class="topic active" aria-current="page">
-        <span class="topic-number">01</span>
-        <span><strong>Acid–Base Titrations</strong><small>Interactive simulation</small></span>
-      </button>
+      <button class="topic active" aria-current="page"><span class="topic-number">01</span><span><strong>Acid–Base Titrations</strong><small>Interactive simulation</small></span></button>
       <div class="future-note">Additional General Chemistry sections can be added to this shell and later connected to the Adaptive Trainer Core.</div>
-
-      <div class="core-note">
-        <strong>Trainer-ready architecture</strong>
-        <span>Chemistry state, representations, and interactions remain separate so this simulator can become a domain tool inside the adaptive trainer.</span>
-      </div>
-      <div class="build-version" aria-label="Application version">GenChem App v0.12.8</div>
+      <div class="core-note"><strong>Trainer-ready architecture</strong><span>Quantitative chemistry and instructional representations are separate so coaching can focus on student reasoning without changing the underlying model.</span></div>
+      <div class="build-version" aria-label="Application version">GenChem App v0.13.0</div>
     </aside>
-
     <main class="main">
-      <header class="topbar">
-        <div>
-          <p class="eyebrow">ACID–BASE TITRATIONS</p>
-          <h1>Perform the titration. See the chemistry.</h1>
-          <p class="lede">Build the titration curve while following the changing microscopic composition, amount of reaction water produced, and indicator response.</p>
-        </div>
-      </header>
-
+      <header class="topbar"><div><p class="eyebrow">ACID–BASE TITRATIONS</p><h1>Perform the titration. See the chemistry.</h1><p class="lede">Build the quantitative titration curve while using a small, countable particulate model to reason about which species react, remain, or become excess.</p></div></header>
       <section class="scenario-row" id="scenario-row" aria-label="Titration scenarios"></section>
-
-      <section class="monitor-toolbar" aria-label="Species monitor display options">
-        <div class="monitor-toolbar-title">Species monitor</div>
-        <div class="monitor-controls monitor-controls-inline">
-          <div class="toggle-block"><span>Measure</span><div class="segmented"><button data-monitor-mode="concentration" class="active">Concentration</button><button data-monitor-mode="amount">Amount</button></div></div>
-          <div class="toggle-block" id="amount-unit-block" hidden><span>Amount units</span><div class="segmented"><button data-amount-unit="moles" class="active">Moles</button><button data-amount-unit="molecules">Molecules / ions</button></div></div>
-          <div class="toggle-block"><span>Chart</span><div class="segmented"><button data-chart-type="bar" class="active">Bar</button><button data-chart-type="column">Column</button></div></div>
-        </div>
-        <div class="monitor-toolbar-help">Hover over the titration curve to inspect the species present at that point.</div>
-      </section>
-
+      <section class="monitor-toolbar" aria-label="Species monitor display options"><div class="monitor-toolbar-title">Quantitative species monitor</div><div class="monitor-controls monitor-controls-inline"><div class="toggle-block"><span>Measure</span><div class="segmented"><button data-monitor-mode="concentration" class="active">Concentration</button><button data-monitor-mode="amount">Amount</button></div></div><div class="toggle-block" id="amount-unit-block" hidden><span>Amount units</span><div class="segmented"><button data-amount-unit="moles" class="active">Moles</button><button data-amount-unit="molecules">Molecules / ions</button></div></div><div class="toggle-block"><span>Chart</span><div class="segmented"><button data-chart-type="bar" class="active">Bar</button><button data-chart-type="column">Column</button></div></div></div><div class="monitor-toolbar-help">Hover over the titration curve to inspect the quantitative species present at that point. The Live Flask is deliberately countable rather than proportional.</div></section>
       <section class="lab-grid">
         <article class="panel apparatus-panel">
-          <div class="panel-head live-head">
-            <div>
-              <span class="panel-kicker">LIVE FLASK</span>
-              <h2 id="scenario-title">Strong acid + strong base</h2>
-            </div>
-            <div class="head-actions">
-              <div class="legend-toggle" id="equilibrium-badge" hidden>Dynamic HF equilibrium</div>
-              <button class="ghost compact" id="change-setup">Change setup</button>
-            </div>
-          </div>
-
-          <div class="apparatus-stage">
-            <div class="burette-label" id="titrant-label">0.100 M NaOH</div>
-            <div class="live-readouts" aria-label="Live titration measurements">
-              <div><span>pH</span><strong id="ph-readout">1.00</strong></div>
-              <div><span>Titrant added</span><strong id="volume-readout">0.00 mL</strong></div>
-            </div>
-            <div class="burette-wrap" aria-hidden="true">
-              <svg viewBox="0 0 90 310" role="img" aria-label="Burette">
-                <defs>
-                  <linearGradient id="tubeGlass" x1="0" x2="1">
-                    <stop offset="0" stop-color="#a8c9d8" stop-opacity=".48"/>
-                    <stop offset=".30" stop-color="#ffffff" stop-opacity=".92"/>
-                    <stop offset=".62" stop-color="#dff4fb" stop-opacity=".36"/>
-                    <stop offset="1" stop-color="#7fa7b8" stop-opacity=".54"/>
-                  </linearGradient>
-                </defs>
-                <rect x="34" y="10" width="22" height="225" rx="7" fill="url(#tubeGlass)" stroke="#789bab" stroke-width="2"/>
-                <rect x="38" y="18" width="14" height="205" rx="4" fill="#d9f4ff" opacity=".68"/>
-                <path d="M40 20V218" stroke="#fff" stroke-opacity=".75" stroke-width="3"/>
-                <g stroke="#c2444c" stroke-width="1"><path d="M56 40h8 M56 55h5 M56 70h8 M56 85h5 M56 100h8 M56 115h5 M56 130h8 M56 145h5 M56 160h8 M56 175h5 M56 190h8"/></g>
-                <rect x="26" y="225" width="38" height="8" rx="3" fill="#cb3947"/>
-                <rect x="41" y="232" width="8" height="32" fill="#b8d5e1" stroke="#819dab"/>
-                <path d="M45 263v27" stroke="#819dab" stroke-width="4"/><path d="M45 290l-4 12h8z" fill="#819dab"/>
-              </svg>
-              <div class="falling-drop" id="falling-drop"></div>
-            </div>
-            <div id="flask-view" class="flask-view" aria-label="Animated molecular view of the titration flask"></div>
-          </div>
-
-          <div class="flask-caption">
-            <div><span>Analyte / titrand</span><strong id="analyte-label"></strong></div>
-            <div><span>Microscopic state</span><strong id="micro-summary"></strong></div>
-          </div>
-
-          <div class="controls">
-            <div class="increment-control">
-              <label for="increment">Addition size</label>
-              <select id="increment">
-                <option value="0.1">0.10 mL</option><option value="0.25">0.25 mL</option>
-                <option value="0.5" selected>0.50 mL</option><option value="1">1.00 mL</option>
-                <option value="2">2.00 mL</option><option value="5">5.00 mL</option>
-              </select>
-            </div>
-            <button class="primary" id="add-button">Add titrant</button>
-            <button class="secondary" id="auto-button">Auto titrate</button>
-            <button class="ghost" id="reset-button">Reset run</button>
-          </div>
-          <p class="control-help" id="control-help"></p>
+          <div class="panel-head live-head"><div><span class="panel-kicker">LIVE FLASK · COUNTABLE PARTICULATE MODEL</span><h2 id="scenario-title">Strong acid + strong base</h2></div><div class="head-actions"><div class="legend-toggle" id="equilibrium-badge" hidden></div><button class="ghost compact" id="change-setup">Change setup</button></div></div>
+          <div class="apparatus-stage"><div class="burette-label" id="titrant-label">0.100 M NaOH</div><div class="live-readouts" aria-label="Live titration measurements"><div><span>pH</span><strong id="ph-readout">1.00</strong></div><div><span>Titrant added</span><strong id="volume-readout">0.00 mL</strong></div></div><div class="burette-wrap" aria-hidden="true"><svg viewBox="0 0 90 310" role="img" aria-label="Burette"><defs><linearGradient id="tubeGlass" x1="0" x2="1"><stop offset="0" stop-color="#a8c9d8" stop-opacity=".48"/><stop offset=".30" stop-color="#ffffff" stop-opacity=".92"/><stop offset=".62" stop-color="#dff4fb" stop-opacity=".36"/><stop offset="1" stop-color="#7fa7b8" stop-opacity=".54"/></linearGradient></defs><rect x="34" y="10" width="22" height="225" rx="7" fill="url(#tubeGlass)" stroke="#789bab" stroke-width="2"/><rect x="38" y="18" width="14" height="205" rx="4" fill="#d9f4ff" opacity=".68"/><path d="M40 20V218" stroke="#fff" stroke-opacity=".75" stroke-width="3"/><g stroke="#c2444c" stroke-width="1"><path d="M56 40h8 M56 55h5 M56 70h8 M56 85h5 M56 100h8 M56 115h5 M56 130h8 M56 145h5 M56 160h8 M56 175h5 M56 190h8"/></g><rect x="26" y="225" width="38" height="8" rx="3" fill="#cb3947"/><rect x="41" y="232" width="8" height="32" fill="#b8d5e1" stroke="#819dab"/><path d="M45 263v27" stroke="#819dab" stroke-width="4"/><path d="M45 290l-4 12h8z" fill="#819dab"/></svg><div class="falling-drop" id="falling-drop"></div></div><div id="flask-view" class="flask-view" aria-label="Countable particulate view of the titration flask"></div></div>
+          <div class="flask-caption"><div><span>Analyte / titrand</span><strong id="analyte-label"></strong></div><div><span>Microscopic state</span><strong id="micro-summary"></strong></div></div>
+          <div class="instruction-toolbar"><div class="particle-legend-wrap"><span class="instruction-label">Particle key</span><div class="particle-legend" id="particle-legend"></div></div><div class="instruction-actions"><button class="ghost" id="freeze-particles" aria-pressed="false">Freeze particles</button><button class="ghost" id="spectator-toggle" aria-pressed="false">Hide spectator ions</button></div></div>
+          <div class="controls"><div class="increment-control"><label for="increment">Addition size</label><select id="increment"><option value="0.1">0.10 mL</option><option value="0.25">0.25 mL</option><option value="0.5" selected>0.50 mL</option><option value="1">1.00 mL</option><option value="2">2.00 mL</option><option value="5">5.00 mL</option></select></div><button class="primary" id="add-button">Add titrant</button><button class="secondary" id="auto-button">Auto titrate</button><button class="ghost" id="reset-button">Reset run</button></div><p class="control-help" id="control-help"></p>
         </article>
-
-        <div class="analysis-column">
-          <article class="panel reaction-panel">
-            <div class="panel-head">
-              <div><span class="panel-kicker">REACTION CLOSE-UP</span><h2>Magnified proton-transfer event</h2></div>
-              <span class="reaction-note">A few molecules only, so the chemistry does not disappear into the crowd.</span>
-            </div>
-            <div id="reaction-closeup" class="reaction-closeup"></div>
-          </article>
-
-          <article class="panel curve-panel">
-            <div class="panel-head">
-              <div><span class="panel-kicker">TITRATION CURVE</span><h2>pH vs. volume added</h2></div>
-              <button class="ghost compact" id="return-live" hidden>Return to endpoint</button>
-            </div>
-            <div class="curve-stage">
-              <div id="curve-view" class="curve-view"></div>
-              <div id="curve-species-popover" class="curve-species-popover" hidden aria-live="polite">
-                <div class="curve-species-head">
-                  <div class="curve-tooltip-reading">
-                    <span>SPECIES AT CURSOR</span>
-                    <strong id="curve-species-ph">pH 1.00</strong>
-                    <small id="curve-species-volume">0.00 mL titrant added</small>
-                  </div>
-                  <div id="species-monitor-title" class="curve-species-mode">Concentration in flask</div>
-                </div>
-                <div id="species-bars" class="species-bars"></div>
-                <p class="bars-note" id="bars-note"></p>
-              </div>
-            </div>
-            <div class="curve-footer">
-              <div id="curve-instruction"></div>
-            </div>
-          </article>
-        </div>
+        <div class="analysis-column"><article class="panel reaction-panel"><div class="panel-head"><div><span class="panel-kicker">REACTION CLOSE-UP</span><h2>Magnified proton-transfer event</h2></div><span class="reaction-note">Water formed by the titration appears during the event and then blends into the solvent instead of accumulating in the flask.</span></div><div id="reaction-closeup" class="reaction-closeup"></div></article><article class="panel curve-panel"><div class="panel-head"><div><span class="panel-kicker">TITRATION CURVE</span><h2>pH vs. volume added</h2></div><button class="ghost compact" id="return-live" hidden>Return to endpoint</button></div><div class="curve-stage"><div id="curve-view" class="curve-view"></div><div id="curve-species-popover" class="curve-species-popover" hidden aria-live="polite"><div class="curve-species-head"><div class="curve-tooltip-reading"><span>SPECIES AT CURSOR</span><strong id="curve-species-ph">pH 1.00</strong><small id="curve-species-volume">0.00 mL titrant added</small></div><div id="species-monitor-title" class="curve-species-mode">Concentration in flask</div></div><div id="species-bars" class="species-bars"></div><p class="bars-note" id="bars-note"></p></div></div><div class="curve-footer"><div id="curve-instruction"></div></div></article></div>
       </section>
-
-      <section class="chemistry-strip">
-        <div><span class="strip-label">Net chemistry</span><strong id="reaction-line"></strong></div>
-        <div><span class="strip-label">What controls the pH?</span><strong id="region-label"></strong></div>
-        <div><span class="strip-label">Equivalence volume</span><strong id="equivalence-readout"></strong></div>
-      </section>
+      <section class="panel coach-panel" aria-labelledby="coach-title"><div class="coach-head"><div><span class="panel-kicker">ASSISTANT TEACHER</span><h2 id="coach-title">Interpret the chemistry, not just the colors.</h2></div><div class="segmented learning-mode-toggle" aria-label="Learning mode"><button data-learning-mode="explore" class="active">Explore</button><button data-learning-mode="review" disabled>Review &amp; Explain</button></div></div><p class="coach-intro">Run the full titration first. Then revisit countable checkpoints and explain what the representation means chemically.</p><div class="checkpoint-row" id="checkpoint-row" aria-label="Instructional checkpoints"></div><div class="coach-workspace"><div class="coach-question"><span class="instruction-label" id="coach-stage">Explore first</span><strong id="coach-prompt">Run the titration once, then review the important stages.</strong></div><form id="coach-form"><label for="coach-input">Explain your reasoning</label><textarea id="coach-input" rows="3" placeholder="What do the particles represent, and why are they changing?" disabled></textarea><button type="submit" class="primary" disabled>Check my reasoning</button></form><div class="coach-response" id="coach-response" aria-live="polite"></div></div></section>
+      <section class="chemistry-strip"><div><span class="strip-label">Net chemistry</span><strong id="reaction-line"></strong></div><div><span class="strip-label">What controls the pH?</span><strong id="region-label"></strong></div><div><span class="strip-label">Equivalence volume</span><strong id="equivalence-readout"></strong></div></section>
     </main>
   </div>
-
-  <div class="setup-overlay" id="setup-overlay" role="dialog" aria-modal="true" aria-labelledby="setup-title">
-    <div class="setup-dialog">
-      <div class="setup-heading">
-        <div><span class="panel-kicker">EXPERIMENT SETUP</span><h2 id="setup-title">Choose starting conditions</h2><p id="setup-scenario"></p></div>
-      </div>
-      <form id="setup-form">
-        <div class="setup-grid">
-          <label class="setup-scenario-field"><span>Titration scenario</span><select id="setup-scenario-select"><option value="strong-acid-strong-base">Strong acid (HCl) + strong base (NaOH)</option><option value="weak-acid-strong-base">Weak acid (HF) + strong base (NaOH)</option><option value="weak-base-strong-acid">Weak base (NH₃) + strong acid (HCl)</option></select></label>
-          <label><span>Analyte stock concentration</span><div class="input-unit"><input id="stock-m" type="number" min="0.001" max="2" step="0.001" required><b>M</b></div></label>
-          <label><span>Stock solution used</span><div class="input-unit"><input id="stock-ml" type="number" min="0.1" max="200" step="0.1" required><b>mL</b></div></label>
-          <label><span>Water added to analyte</span><div class="input-unit"><input id="water-ml" type="number" min="0" max="300" step="0.1" required><b>mL</b></div></label>
-          <label><span>Titrant concentration</span><div class="input-unit"><input id="titrant-m" type="number" min="0.001" max="2" step="0.001" required><b>M</b></div></label>
-          <label class="indicator-field"><span>Indicator</span><select id="indicator"><option value="phenolphthalein">Phenolphthalein</option><option value="methyl-red">Methyl red</option><option value="none">No indicator</option></select></label>
-        </div>
-        <div class="setup-derived">
-          <div><span>Final analyte volume</span><strong id="derived-volume"></strong></div>
-          <div><span>Final analyte concentration</span><strong id="derived-concentration"></strong></div>
-          <div><span>Expected equivalence</span><strong id="derived-equivalence"></strong></div>
-          <div><span>Simulation endpoint</span><strong id="derived-endpoint"></strong></div>
-        </div>
-        <p class="setup-explanation">The analyte concentration is calculated from the stock dilution. The simulation continues to twice the expected equivalence volume so the post-equivalence region remains visible.</p>
-        <div class="setup-error" id="setup-error" hidden></div>
-        <div class="setup-actions"><button type="button" class="ghost" id="cancel-setup" hidden>Cancel</button><button type="submit" class="primary">Start experiment</button></div>
-      </form>
-    </div>
-  </div>
-
+  <div class="setup-overlay" id="setup-overlay" role="dialog" aria-modal="true" aria-labelledby="setup-title"><div class="setup-dialog"><div class="setup-heading"><div><span class="panel-kicker">EXPERIMENT SETUP</span><h2 id="setup-title">Choose starting conditions</h2><p id="setup-scenario"></p></div></div><form id="setup-form"><div class="setup-grid"><label class="setup-scenario-field"><span>Titration scenario</span><select id="setup-scenario-select"><option value="strong-acid-strong-base">Strong acid (HCl) + strong base (NaOH)</option><option value="weak-acid-strong-base">Weak acid (HF) + strong base (NaOH)</option><option value="weak-base-strong-acid">Weak base (NH₃) + strong acid (HCl)</option></select></label><label><span>Analyte stock concentration</span><div class="input-unit"><input id="stock-m" type="number" min="0.001" max="2" step="0.001" required><b>M</b></div></label><label><span>Stock solution used</span><div class="input-unit"><input id="stock-ml" type="number" min="0.1" max="200" step="0.1" required><b>mL</b></div></label><label><span>Water added to analyte</span><div class="input-unit"><input id="water-ml" type="number" min="0" max="300" step="0.1" required><b>mL</b></div></label><label><span>Titrant concentration</span><div class="input-unit"><input id="titrant-m" type="number" min="0.001" max="2" step="0.001" required><b>M</b></div></label><label class="indicator-field"><span>Indicator</span><select id="indicator"><option value="phenolphthalein">Phenolphthalein</option><option value="methyl-red">Methyl red</option><option value="none">No indicator</option></select></label></div><div class="setup-derived"><div><span>Final analyte volume</span><strong id="derived-volume"></strong></div><div><span>Final analyte concentration</span><strong id="derived-concentration"></strong></div><div><span>Expected equivalence</span><strong id="derived-equivalence"></strong></div><div><span>Simulation endpoint</span><strong id="derived-endpoint"></strong></div></div><p class="setup-explanation">The analyte concentration is calculated from the stock dilution. The simulation continues to twice the expected equivalence volume so the post-equivalence region remains visible.</p><div class="setup-error" id="setup-error" hidden></div><div class="setup-actions"><button type="button" class="ghost" id="cancel-setup" hidden>Cancel</button><button type="submit" class="primary">Start experiment</button></div></form></div></div>
   <script type="module" src="./src/app.js"></script>
 </body>
 </html>
