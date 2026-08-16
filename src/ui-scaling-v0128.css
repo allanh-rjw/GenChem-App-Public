@@ -1,19 +1,19 @@
 /* v0.12.8 sizing hotfix: normalize both the main application and the startup
    experiment-setup dialog at 100% browser zoom. The setup dialog lives outside
    .app-shell, so scaling only .app-shell left the initial load view oversized.
-   Use a compact 64% desktop scale so the full simulation fits comfortably in
+   Use a compact 53% desktop scale so the full simulation fits comfortably in
    a normal browser window without changing the responsive mobile layout. */
 @media (min-width:721px){
   .app-shell{
-    zoom:.64;
-    width:156.25%;
-    min-height:156.25vh;
+    zoom:.53;
+    width:188.67925%;
+    min-height:188.67925vh;
   }
   .sidebar{
-    height:156.25vh;
+    height:188.67925vh;
   }
   .setup-dialog{
-    zoom:.64;
+    zoom:.53;
   }
 }
 
