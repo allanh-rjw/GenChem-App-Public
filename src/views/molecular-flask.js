@@ -8,7 +8,6 @@ function seeded(index, salt = 0) {
   const x = Math.sin(index * 977 + salt * 41.17) * 43758.5453;
   return x - Math.floor(x);
 }
-
 function fractional(value) { return value - Math.floor(value); }
 function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
 
@@ -33,7 +32,6 @@ const RELATIVE_MASS = {
   Hplus: 1.008, H2O: 18.015, H3O: 19.023, OH: 17.007, HF: 20.006,
   F: 18.998, Na: 22.990, Cl: 35.45, NH3: 17.031, NH4: 18.039
 };
-
 function speedFactorFor(kind) {
   const mass = RELATIVE_MASS[kind] || 18;
   return Math.max(.72, Math.min(1.48, Math.sqrt(18 / mass)));
@@ -48,6 +46,26 @@ export function distributedPosition(index, total) {
     y: .035 + Math.pow(rawY, .34) * .91,
     z: (fractional(index * 0.56984029099 + .43) - .5) * 1.80
   };
+}
+
+function interleaveDescriptors(descriptors) {
+  const buckets = new Map();
+  for (const descriptor of descriptors) {
+    const key = descriptor.speciesKey || descriptor.kind;
+    if (!buckets.has(key)) buckets.set(key, []);
+    buckets.get(key).push(descriptor);
+  }
+  const groups = [...buckets.values()].sort((a, b) => b.length - a.length);
+  const out = [];
+  let remaining = descriptors.length;
+  while (remaining > 0) {
+    for (const group of groups) {
+      if (!group.length) continue;
+      out.push(group.shift());
+      remaining -= 1;
+    }
+  }
+  return out;
 }
 
 const MOLECULE_EXTENT_FACTOR = {
@@ -115,7 +133,6 @@ export class MolecularFlaskView {
   }
 
   setFrozen(frozen) { this.frozen = Boolean(frozen); this.lastTime = performance.now(); }
-
   setShowSpectators(show) {
     const next = Boolean(show);
     if (next === this.showSpectators) return;
@@ -133,7 +150,7 @@ export class MolecularFlaskView {
     this.scenario = scenario;
     this.state = state;
     this.updateLiquid();
-    const descriptors = particleDescriptors(scenario, state, { showSpectators: this.showSpectators });
+    const descriptors = interleaveDescriptors(particleDescriptors(scenario, state, { showSpectators: this.showSpectators }));
     this.particles = descriptors.map((descriptor, i) => {
       const reuse = oldBySpecies.get(descriptor.speciesKey)?.shift();
       if (reuse) {
@@ -146,19 +163,20 @@ export class MolecularFlaskView {
       }
       const motionId = this.nextMotionId++;
       const pos = distributedPosition(i, descriptors.length);
-      const speed = speedFactorFor(descriptor.kind);
+      const speciesSpeed = speedFactorFor(descriptor.kind);
+      const mobility = speciesSpeed * (.70 + seeded(motionId, 22) * .65);
       return {
         ...descriptor, ...pos, motionId, rngState: motionSeedForId(motionId), u: seeded(motionId, 21),
-        vu: (seeded(motionId, 5) - .5) * .22 * speed,
-        vx: (seeded(motionId, 4) - .5) * .30 * speed,
-        vz: (seeded(motionId, 6) - .5) * .24 * speed,
-        speedFactor: speed,
+        vu: (seeded(motionId, 5) - .5) * .34 * mobility,
+        vx: (seeded(motionId, 4) - .5) * .46 * mobility,
+        vz: (seeded(motionId, 6) - .5) * .38 * mobility,
+        speedFactor: mobility,
         rx: seeded(motionId, 7) * Math.PI * 2,
         ry: seeded(motionId, 8) * Math.PI * 2,
         rz: seeded(motionId, 9) * Math.PI * 2,
-        avx: (seeded(motionId, 10) - .5) * .92,
-        avy: (seeded(motionId, 11) - .5) * .92,
-        avz: (seeded(motionId, 12) - .5) * .72,
+        avx: (seeded(motionId, 10) - .5) * 1.35,
+        avy: (seeded(motionId, 11) - .5) * 1.35,
+        avz: (seeded(motionId, 12) - .5) * 1.05,
         scale: (.84 + seeded(motionId, 13) * .33) * (descriptor.contextScale || 1)
       };
     });
@@ -166,11 +184,13 @@ export class MolecularFlaskView {
     for (const p of this.particles) {
       if (!Number.isFinite(p.motionId)) p.motionId = this.nextMotionId++;
       if (!Number.isFinite(p.rngState)) p.rngState = motionSeedForId(p.motionId);
+      if (!Number.isFinite(p.speedFactor)) p.speedFactor = speedFactorFor(p.kind) * (.70 + seeded(p.motionId, 22) * .65);
       if (!Number.isFinite(p.u)) p.u = seeded(p.motionId, 21);
-      p.u = Math.max(0, Math.min(1, p.u));
+      p.u = clamp(p.u, 0, 1);
       p.y = this.volumeFractionToY(p.u, g, p);
       this.constrainParticle(p, g, false);
     }
+    this.separateParticles(g, .016, true);
   }
 
   updateLiquid() {
@@ -205,14 +225,14 @@ export class MolecularFlaskView {
   wallHalfWidthAt(y, g) {
     const ySvg = (y / g.h) * 620;
     if (ySvg <= 477) {
-      const t = Math.max(0, Math.min(1, (ySvg - 171) / 306));
+      const t = clamp((ySvg - 171) / 306, 0, 1);
       return ((71 + 221 * t) / 700) * g.w;
     }
     if (ySvg <= 535) {
-      const t = Math.max(0, Math.min(1, (ySvg - 477) / 58));
+      const t = clamp((ySvg - 477) / 58, 0, 1);
       return ((292 + 23 * t) / 700) * g.w;
     }
-    const u = Math.max(0, Math.min(1, (ySvg - 535) / 57));
+    const u = clamp((ySvg - 535) / 57, 0, 1);
     return (315 * Math.sqrt(Math.max(0, 1 - Math.pow(u, 4))) / 700) * g.w;
   }
 
@@ -258,12 +278,11 @@ export class MolecularFlaskView {
       prevW = w;
     }
     if (total <= 0) return minY + (maxY - minY) * q;
-    const target = Math.max(0, Math.min(1, q)) * total;
+    const target = clamp(q, 0, 1) * total;
     let i = 1;
     while (i < cumulative.length && cumulative[i] < target) i += 1;
     if (i >= cumulative.length) return maxY;
-    const a = cumulative[i - 1];
-    const b = cumulative[i];
+    const a = cumulative[i - 1], b = cumulative[i];
     const local = b > a ? (target - a) / (b - a) : 0;
     const y0 = minY + (maxY - minY) * ((i - 1) / samples);
     const y1 = minY + (maxY - minY) * (i / samples);
@@ -271,7 +290,7 @@ export class MolecularFlaskView {
   }
 
   constrainParticle(p, g, bounce = false) {
-    p.u = Math.max(0, Math.min(1, p.u));
+    p.u = clamp(p.u, 0, 1);
     p.y = this.volumeFractionToY(p.u, g, p);
     const y = g.surface + p.y * (g.bottom - g.surface);
     const extent = this.particleExtent(p, g);
@@ -283,12 +302,50 @@ export class MolecularFlaskView {
     const maxX = Math.max(.02, Math.min(.985, usableHalf / originHalf));
     if (p.x < -maxX || p.x > maxX) {
       if (bounce) p.vx *= -1;
-      p.x = Math.max(-maxX, Math.min(maxX, p.x));
+      p.x = clamp(p.x, -maxX, maxX);
     }
     if (p.z < -.90 || p.z > .90) {
       if (bounce) p.vz *= -1;
-      p.z = Math.max(-.90, Math.min(.90, p.z));
+      p.z = clamp(p.z, -.90, .90);
     }
+  }
+
+  separateParticles(g, dt, reposition = false) {
+    const particles = this.particles;
+    for (let i = 0; i < particles.length; i += 1) {
+      const a = particles[i];
+      const oa = this.particleOrigin(a, g);
+      for (let j = i + 1; j < particles.length; j += 1) {
+        const b = particles[j];
+        const ob = this.particleOrigin(b, g);
+        let dx = oa.x - ob.x;
+        let dy = oa.y - ob.y;
+        let dz = (a.z - b.z) * Math.max(38, g.w * .055);
+        let dist = Math.hypot(dx, dy, dz);
+        const minDistance = clamp((this.particleExtent(a, g) + this.particleExtent(b, g)) * .34, 24, 58);
+        if (dist >= minDistance) continue;
+        if (dist < .001) {
+          const angle = ((a.motionId * 2.3999632297 + b.motionId * 1.6180339887) % (Math.PI * 2));
+          dx = Math.cos(angle); dy = Math.sin(angle); dz = .35;
+          dist = Math.hypot(dx, dy, dz);
+        }
+        const nx = dx / dist, ny = dy / dist, nz = dz / dist;
+        const overlap = 1 - dist / minDistance;
+        const impulse = (.26 + overlap * .22) * overlap;
+        a.vx += nx * impulse; b.vx -= nx * impulse;
+        a.vu += ny * impulse * .52; b.vu -= ny * impulse * .52;
+        a.vz += nz * impulse * .58; b.vz -= nz * impulse * .58;
+        if (reposition || overlap > .35) {
+          const push = (reposition ? .028 : .012) * overlap;
+          a.x += nx * push; b.x -= nx * push;
+          a.u = clamp(a.u + ny * push * .75, 0, 1);
+          b.u = clamp(b.u - ny * push * .75, 0, 1);
+          a.z = clamp(a.z + nz * push, -.90, .90);
+          b.z = clamp(b.z - nz * push, -.90, .90);
+        }
+      }
+    }
+    for (const p of particles) this.constrainParticle(p, g, true);
   }
 
   animate(time) {
@@ -301,28 +358,29 @@ export class MolecularFlaskView {
 
   updateParticles(dt) {
     const g = this.liquidGeometry();
-    const damping = Math.exp(-1.15 * dt);
-    const brownianKick = .13 * Math.sqrt(dt);
+    const damping = Math.exp(-3.1 * dt);
+    const brownianKick = .30 * Math.sqrt(dt);
     for (const p of this.particles) {
-      const speed = p.speedFactor || 1;
-      p.vx = p.vx * damping + nextIndependentNoise(p) * brownianKick * speed;
-      p.vu = p.vu * damping + nextIndependentNoise(p) * brownianKick * .72 * speed;
-      p.vz = p.vz * damping + nextIndependentNoise(p) * brownianKick * .82 * speed;
-      p.vx = clamp(p.vx, -.48 * speed, .48 * speed);
-      p.vu = clamp(p.vu, -.34 * speed, .34 * speed);
-      p.vz = clamp(p.vz, -.40 * speed, .40 * speed);
+      const mobility = p.speedFactor || 1;
+      p.vx = p.vx * damping + nextIndependentNoise(p) * brownianKick * mobility;
+      p.vu = p.vu * damping + nextIndependentNoise(p) * brownianKick * .76 * mobility;
+      p.vz = p.vz * damping + nextIndependentNoise(p) * brownianKick * .88 * mobility;
+      p.vx = clamp(p.vx, -.72 * mobility, .72 * mobility);
+      p.vu = clamp(p.vu, -.52 * mobility, .52 * mobility);
+      p.vz = clamp(p.vz, -.60 * mobility, .60 * mobility);
       p.x += p.vx * dt;
       p.u += p.vu * dt;
       p.z += p.vz * dt;
       if (p.u < 0 || p.u > 1) {
         p.vu *= -1;
-        p.u = Math.max(0, Math.min(1, p.u));
+        p.u = clamp(p.u, 0, 1);
       }
-      p.rx += p.avx * dt * speed;
-      p.ry += p.avy * dt * speed;
-      p.rz += p.avz * dt * speed;
+      p.rx += p.avx * dt * mobility;
+      p.ry += p.avy * dt * mobility;
+      p.rz += p.avz * dt * mobility;
       this.constrainParticle(p, g, true);
     }
+    this.separateParticles(g, dt, false);
   }
 
   traceLiquidClip(ctx, g) {
@@ -354,8 +412,7 @@ export class MolecularFlaskView {
 
   draw(time) {
     if (!this.ctx || !this.dpr) return;
-    const ctx = this.ctx;
-    const g = this.liquidGeometry();
+    const ctx = this.ctx, g = this.liquidGeometry();
     ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     ctx.clearRect(0, 0, g.w, g.h);
     ctx.save();
