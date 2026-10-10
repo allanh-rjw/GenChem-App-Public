@@ -6,7 +6,7 @@ const LEGEND = {
   Hplus: { key: 'Hplus', kind: 'Hplus', label: 'H⁺', color: '#f8fbff', charge: '+', spectator: false },
   OH: { key: 'OH', kind: 'OH', label: 'OH⁻', color: '#ff4a58', charge: '−', spectator: false },
   Na: { key: 'Na', kind: 'Na', label: 'Na⁺', color: '#9b68ff', charge: '+', spectator: true },
-  Cl: { key: 'Cl', kind: 'Cl', label: 'Cl⁻', color: '#28cf63', charge: '−', spectator: true },
+  Cl: { key: 'Cl', kind: 'Cl', label: 'Cl⁻', color: '#f4d03f', charge: '−', spectator: true },
   HF: { key: 'HF', kind: 'HF', label: 'HF', color: '#43df48', charge: '', spectator: false },
   F: { key: 'F', kind: 'F', label: 'F⁻', color: '#42e74a', charge: '−', spectator: false },
   NH3: { key: 'NH3', kind: 'NH3', label: 'NH₃', color: '#376dff', charge: '', spectator: false },
